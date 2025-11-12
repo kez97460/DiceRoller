@@ -105,3 +105,4 @@ help:
 	@echo "  make release    - Build optimized version"
 	@echo "  make run        - Build and run"
 	@echo "  make clean      - Remove all build artifacts"
+	@echo "  make install    - Build and install into /usr/local/bin (requires sudo)"

@@ -36,8 +36,13 @@ uint32_t private_getFirstNumber(char *string)
     return res;
 }
 
-
-void private_parseElementInBuffer(ParsedElementArray_t *element_array_ptr, char *buffer)
+/**
+ * Parse an element in string form into an element array
+ * 
+ * @param element_array_ptr 
+ * @param buffer 
+ */
+ParsedElementError_t private_parseElementInBuffer(ParsedElementArray_t *element_array_ptr, char *buffer)
 {
     // This handles dice and numbers.
     //TODO: make this return an error if the string is invalid (contains something other than 0-9 and d)
@@ -45,7 +50,7 @@ void private_parseElementInBuffer(ParsedElementArray_t *element_array_ptr, char 
     // Check if string is empty
     if (strlen(buffer) == 0)
     {
-        return; //TODO: error
+        return PELEM_ERR_INVALID_INPUT;
     }
     
 
@@ -58,7 +63,7 @@ void private_parseElementInBuffer(ParsedElementArray_t *element_array_ptr, char 
 
         if (dice_count == 0 || dice_sides == 0)
         {
-            //TODO: Error handling
+            return PELEM_ERR_INVALID_INPUT;
         }
 
         parsedElements_arrayAppend(element_array_ptr, (ParsedElement_t) {TYPE_OPERATOR, OPERATOR_OPEN_P});
@@ -76,11 +81,6 @@ void private_parseElementInBuffer(ParsedElementArray_t *element_array_ptr, char 
     {
         uint32_t number = private_getFirstNumber(buffer);
 
-        if (number == 0)
-        {
-            //TODO: Error handling
-        }
-
         ParsedElement_t number_element = {
             .type = TYPE_NUMBER,
             .subtype = number
@@ -88,6 +88,8 @@ void private_parseElementInBuffer(ParsedElementArray_t *element_array_ptr, char 
 
         parsedElements_arrayAppend(element_array_ptr, number_element);
     }
+
+    return PELEM_OK;
 }
 
 uint32_t private_getOperatorPrecedence(Operator_t op)
@@ -266,7 +268,7 @@ end:
  * Public functions
  */
 
-int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is_disadvantage)
+int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is_disadvantage, bool print_steps)
 {
     // ---Transform string into array of ParsedElements
 
@@ -285,7 +287,7 @@ int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is
 
             if (element_length >= ELEMENT_BUFFER_SIZE - 1)
             {
-                //TODO: error handling
+                return -6666;
             }
         }
         else
@@ -308,10 +310,10 @@ int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is
 
     // Print formula
     parsedElement_printArray(parsed_formula);
-    printf("\n");
+    if (print_steps) {printf("\n");}
 
     // ---Roll dice to transform into numbers
-    printf("---Throwing dice---\n");
+    if (print_steps) {printf("---Throwing dice---\n");}
 
     for (uint32_t i = 0; i < parsed_formula.current_length; i++)
     {
@@ -328,7 +330,7 @@ int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is
 
                 dice_result = (dice1 > dice2) ? dice1 : dice2;
 
-                printf("Throwing d20 with advantage: {%d, %d} -> >%d<\n", dice1, dice2, dice_result);
+                if (print_steps) {printf("Throwing d20 with advantage: {%d, %d} -> >%d<\n", dice1, dice2, dice_result);}
                 is_advantage = false;
             } 
             else if (is_disadvantage && (side_count == 20))
@@ -339,14 +341,14 @@ int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is
 
                 dice_result = (dice1 < dice2) ? dice1 : dice2;
 
-                printf("Throwing d20 with disadvantage: {%d, %d} -> >%d<\n", dice1, dice2, dice_result);
+                if (print_steps) {printf("Throwing d20 with disadvantage: {%d, %d} -> >%d<\n", dice1, dice2, dice_result);}
                 is_disadvantage = false;
             }
             else if (side_count == 20)
             {
                 // d20 logs its result to make detecting nat 1/ nat 20 easy
                 dice_result = simpleRNG_randomUint32InRange(1, side_count);
-                printf("Throwing d20 : >%d<\n", dice_result);
+                if (print_steps) {printf("Throwing d20 : >%d<\n", dice_result);}
             }
             else
             {
@@ -357,8 +359,8 @@ int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is
     }
 
     // Print formula
-    parsedElement_printArray(parsed_formula);
-    printf("\n");
+    if (print_steps) {parsedElement_printArray(parsed_formula);}
+    if (print_steps) {printf("\n");}
     
     // ---Calculate final result
     return private_calculateExpression(parsed_formula);

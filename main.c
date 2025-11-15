@@ -13,6 +13,7 @@
         BOOLEAN_ARG(help, "-h", "Show help") \
         BOOLEAN_ARG(advantage, "-a", "Throw first d20 with advantage") \
         BOOLEAN_ARG(disadvantage, "-d", "Throw first d20 with disadvantage") \
+        BOOLEAN_ARG(result_only, "-r", "Only print the final result")
 
 #include "easyargs.h"
 #include <stdio.h>
@@ -36,7 +37,7 @@ int main(int argc, char *argv[])
     printf("Processing formula : %s \n", args.dice_formula);
 
 
-    int32_t result = formulaParser_calculateFormula(args.dice_formula, args.advantage, args.disadvantage);
+    int32_t result = formulaParser_calculateFormula(args.dice_formula, args.advantage, args.disadvantage, args.result_only);
 
     printf("Final result: %d\n", result);
 

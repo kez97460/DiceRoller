@@ -5,6 +5,13 @@
 
 typedef enum
 {
+    PELEM_OK,
+    PELEM_ERR_OOB,
+    PELEM_ERR_INVALID_INPUT
+} ParsedElementError_t;
+
+typedef enum
+{
     TYPE_NONE,
     TYPE_OPERATOR,
     TYPE_NUMBER,

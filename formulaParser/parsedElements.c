@@ -173,11 +173,11 @@ void parsedElements_arrayAppend(ParsedElementArray_t *element_array_ptr, ParsedE
  * @param index (must be lower than the current length)
  * @param element 
  */
-void parsedElements_arraySetElement(ParsedElementArray_t *element_array_ptr, uint32_t index, ParsedElement_t element)
+ParsedElementError_t parsedElements_arraySetElement(ParsedElementArray_t *element_array_ptr, uint32_t index, ParsedElement_t element)
 {
     if (index >= element_array_ptr->current_length)
     {
-        return; /// TODO: Error handling
+        return PELEM_ERR_OOB;
     }
 
     element_array_ptr->array[index] = element;
@@ -203,6 +203,11 @@ void parsedElements_arrayClear(ParsedElementArray_t *element_array_ptr)
     element_array_ptr->current_length = 0;
 }
 
+/**
+ * Print an element
+ * 
+ * @param element 
+ */
 void parsedElements_printElement(ParsedElement_t element)
 {
     switch (element.type)
@@ -224,6 +229,11 @@ void parsedElements_printElement(ParsedElement_t element)
     }
 }
 
+/**
+ * Print an element array
+ * 
+ * @param array 
+ */
 void parsedElement_printArray(ParsedElementArray_t array)
 {
     for (uint32_t i = 0; i < array.current_length; i++)

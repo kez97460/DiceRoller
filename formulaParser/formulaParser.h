@@ -4,6 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is_disadvantage);
+int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is_disadvantage, bool print_steps);
 
 #endif /* INC_FORMULAPARSER_H */

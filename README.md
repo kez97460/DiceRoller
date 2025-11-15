@@ -28,14 +28,6 @@ roll 1d8+5
 roll 1d20+1d4+5 -a
 ```
 
-### Flags
-
-| Flag     | Signification |
-| -------- | ------------- |
-| -a | roll with advantage (reroll next d20, take best result) |
-| -d | roll with disadvantage (reroll next d20, take worse result) |
-| -h | show help |
-
 ## License
 
 The main software is under the MIT license (see LICENSE.md). 

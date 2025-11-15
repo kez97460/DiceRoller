@@ -13,16 +13,28 @@
         BOOLEAN_ARG(help, "-h", "Show help") \
         BOOLEAN_ARG(advantage, "-a", "Throw first d20 with advantage") \
         BOOLEAN_ARG(disadvantage, "-d", "Throw first d20 with disadvantage") \
+        BOOLEAN_ARG(result_only, "-r", "Only print the final result")
 
 #include "easyargs.h"
 #include <stdio.h>
 #include "simpleRNG.h"
 #include "time.h"
 #include "formulaParser.h"
+#include <sys/random.h> // For getting good RNG seeds
+
+/*******************************************
+ * Function prototypes
+ */
+
+uint64_t getSeed();
+
+/********************************************
+ * Main
+ */
 
 int main(int argc, char *argv[])
 {
-    simpleRNG_init(time(NULL));
+    simpleRNG_init(getSeed());
 
     args_t args = make_default_args();
 
@@ -32,14 +44,35 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Use your arguments
-    printf("Processing formula : %s \n", args.dice_formula);
+    if (args.result_only == false)
+    {
+        printf("Processing formula : %s \n", args.dice_formula);
+    }
 
+    int32_t result = formulaParser_calculateFormula(args.dice_formula, args.advantage, args.disadvantage, !args.result_only);
 
-    int32_t result = formulaParser_calculateFormula(args.dice_formula, args.advantage, args.disadvantage);
-
-    printf("Final result: %d\n", result);
+    if (args.result_only == false)
+    {
+        printf("Final result: %d\n", result);
+    }
+    else
+    {
+        printf("%d", result);
+    }
 
     return 0;
 }
 
+/********************************************************
+ * Functions
+ */
+
+uint64_t getSeed()
+{
+    uint64_t seed;
+    if (getrandom(&seed, sizeof(seed), 0) != sizeof(seed)) {
+        perror("getrandom");
+        return 0;
+    }
+    return seed;
+}

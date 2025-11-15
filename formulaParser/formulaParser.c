@@ -273,7 +273,15 @@ end:
  * Public functions
  */
 
-int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is_disadvantage, bool print_steps)
+/**
+ * Calculate the result of the dice formula with randomized rolls.
+ * 
+ * @param formula 
+ * @param is_advantage 
+ * @param is_disadvantage 
+ * @param print_steps 
+ */
+int32_t formulaParser_calculateResult(char *formula, bool is_advantage, bool is_disadvantage, bool print_steps)
 {
     // ---Transform string into array of ParsedElements
 
@@ -364,6 +372,164 @@ int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is
             }   
 
             if (parsedElements_arraySetElement(&parsed_formula, i, (ParsedElement_t) {TYPE_NUMBER, dice_result}))
+            {
+                return -5555;
+            }
+        }
+    }
+
+    // Print formula
+    if (print_steps) 
+    {
+        parsedElement_printArray(parsed_formula);
+        printf("\n");
+    }
+    
+    // ---Calculate final result
+    return private_calculateExpression(parsed_formula);
+}
+
+/**
+ * Calculate the result of the formula if all dice hit the max possible value.
+ * 
+ * @param formula 
+ * @param print_steps 
+ */
+int32_t formulaParser_calculateMaxResult(char *formula, bool print_steps)
+{
+        // ---Transform string into array of ParsedElements
+
+    ParsedElementArray_t parsed_formula;
+    char current_element[ELEMENT_BUFFER_SIZE] = {0}; 
+    uint32_t element_length = 0; // current index in the element
+
+    parsedElements_arrayInit(&parsed_formula);
+
+    for (uint32_t i = 0; i < strlen(formula); i++)    
+    {
+        if (parsedElements_charToOperator(formula[i]) == NOT_AN_OPERATOR)
+        {
+            current_element[element_length] = formula[i];
+            element_length++;
+
+            if (element_length >= ELEMENT_BUFFER_SIZE - 1)
+            {
+                return -6666;
+            }
+        }
+        else
+        {
+            if (element_length != 0)
+            {
+                private_parseElementInBuffer(&parsed_formula, current_element);
+                memset(current_element, 0, ELEMENT_BUFFER_SIZE);
+                element_length = 0;
+            }
+
+            parsedElements_arrayAppend(&parsed_formula, (ParsedElement_t) {TYPE_OPERATOR, parsedElements_charToOperator(formula[i])});
+        }
+    }
+
+    if (element_length != 0)
+    {
+        private_parseElementInBuffer(&parsed_formula, current_element);
+    }
+
+    // Print formula
+    if (print_steps) 
+    {
+        parsedElement_printArray(parsed_formula);
+        printf("\n");
+    }
+
+    // ---Roll dice to transform into numbers
+    if (print_steps) {printf("---Throwing dice---\n");}
+
+    for (uint32_t i = 0; i < parsed_formula.current_length; i++)
+    {
+        if (parsed_formula.array[i].type == TYPE_DICE)
+        {
+            uint32_t side_count = parsed_formula.array[i].subtype;
+
+            if (parsedElements_arraySetElement(&parsed_formula, i, (ParsedElement_t) {TYPE_NUMBER, side_count}))
+            {
+                return -5555;
+            }
+        }
+    }
+
+    // Print formula
+    if (print_steps) 
+    {
+        parsedElement_printArray(parsed_formula);
+        printf("\n");
+    }
+    
+    // ---Calculate final result
+    return private_calculateExpression(parsed_formula);
+}
+
+/**
+ * Calculate the result of the formula if all dice hit 1.
+ * 
+ * @param formula 
+ * @param print_steps 
+ */
+int32_t formulaParser_calculateMinResult(char *formula, bool print_steps)
+{
+            // ---Transform string into array of ParsedElements
+
+    ParsedElementArray_t parsed_formula;
+    char current_element[ELEMENT_BUFFER_SIZE] = {0}; 
+    uint32_t element_length = 0; // current index in the element
+
+    parsedElements_arrayInit(&parsed_formula);
+
+    for (uint32_t i = 0; i < strlen(formula); i++)    
+    {
+        if (parsedElements_charToOperator(formula[i]) == NOT_AN_OPERATOR)
+        {
+            current_element[element_length] = formula[i];
+            element_length++;
+
+            if (element_length >= ELEMENT_BUFFER_SIZE - 1)
+            {
+                return -6666;
+            }
+        }
+        else
+        {
+            if (element_length != 0)
+            {
+                private_parseElementInBuffer(&parsed_formula, current_element);
+                memset(current_element, 0, ELEMENT_BUFFER_SIZE);
+                element_length = 0;
+            }
+
+            parsedElements_arrayAppend(&parsed_formula, (ParsedElement_t) {TYPE_OPERATOR, parsedElements_charToOperator(formula[i])});
+        }
+    }
+
+    if (element_length != 0)
+    {
+        private_parseElementInBuffer(&parsed_formula, current_element);
+    }
+
+    // Print formula
+    if (print_steps) 
+    {
+        parsedElement_printArray(parsed_formula);
+        printf("\n");
+    }
+
+    // ---Roll dice to transform into numbers
+    if (print_steps) {printf("---Throwing dice---\n");}
+
+    for (uint32_t i = 0; i < parsed_formula.current_length; i++)
+    {
+        if (parsed_formula.array[i].type == TYPE_DICE)
+        {
+            if (parsedElements_arraySetElement(&parsed_formula, i, (ParsedElement_t) {TYPE_NUMBER, 1}))
             {
                 return -5555;
             }

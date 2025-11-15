@@ -75,7 +75,12 @@ ParsedElementError_t private_parseElementInBuffer(ParsedElementArray_t *element_
         }
 
         // Replace last "+" with ")"
-        parsedElements_arraySetElement(element_array_ptr, element_array_ptr->current_length - 1, (ParsedElement_t) {TYPE_OPERATOR, OPERATOR_CLOSE_P});
+        ParsedElementError_t status = parsedElements_arraySetElement(element_array_ptr, element_array_ptr->current_length - 1, (ParsedElement_t) {TYPE_OPERATOR, OPERATOR_CLOSE_P});
+        if (status)
+        {
+            return status;
+        }
+        
     }
     else 
     {
@@ -309,8 +314,11 @@ int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is
     }
 
     // Print formula
-    parsedElement_printArray(parsed_formula);
-    if (print_steps) {printf("\n");}
+    if (print_steps) 
+    {
+        parsedElement_printArray(parsed_formula);
+        printf("\n");
+    }
 
     // ---Roll dice to transform into numbers
     if (print_steps) {printf("---Throwing dice---\n");}
@@ -353,14 +361,21 @@ int32_t formulaParser_calculateFormula(char *formula, bool is_advantage, bool is
             else
             {
                 dice_result = simpleRNG_randomUint32InRange(1, side_count);
-            }        
-            parsedElements_arraySetElement(&parsed_formula, i, (ParsedElement_t) {TYPE_NUMBER, dice_result});
+            }   
+
+            if (parsedElements_arraySetElement(&parsed_formula, i, (ParsedElement_t) {TYPE_NUMBER, dice_result}))
+            {
+                return -5555;
+            }
         }
     }
 
     // Print formula
-    if (print_steps) {parsedElement_printArray(parsed_formula);}
-    if (print_steps) {printf("\n");}
+    if (print_steps) 
+    {
+        parsedElement_printArray(parsed_formula);
+        printf("\n");
+    }
     
     // ---Calculate final result
     return private_calculateExpression(parsed_formula);

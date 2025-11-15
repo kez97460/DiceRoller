@@ -181,6 +181,7 @@ ParsedElementError_t parsedElements_arraySetElement(ParsedElementArray_t *elemen
     }
 
     element_array_ptr->array[index] = element;
+    return PELEM_OK;
 }
 
 /**
@@ -197,6 +198,7 @@ void parsedElements_arrayClear(ParsedElementArray_t *element_array_ptr)
             .subtype = 0
         };
 
+        // No need to error check here we don't care.
         parsedElements_arraySetElement(element_array_ptr, i, empty_element);
     }
 

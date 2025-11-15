@@ -51,7 +51,7 @@ void parsedElements_arrayResize(ParsedElementArray_t *element_array_ptr, uint32_
 void parsedElements_arrayDeInit(ParsedElementArray_t *element_array_ptr);
 
 void parsedElements_arrayAppend(ParsedElementArray_t *element_array_ptr, ParsedElement_t element);
-void parsedElements_arraySetElement(ParsedElementArray_t *element_array_ptr, uint32_t index, ParsedElement_t element);
+ParsedElementError_t parsedElements_arraySetElement(ParsedElementArray_t *element_array_ptr, uint32_t index, ParsedElement_t element);
 void parsedElements_arrayClear(ParsedElementArray_t *element_array_ptr);
 
 void parsedElements_printElement(ParsedElement_t element);

@@ -8,7 +8,7 @@ TARGET := roll
 # Compiler and base flags
 CC := gcc
 CFLAGS := -Wall -Wextra -Werror -std=c17
-LDFLAGS :=
+LDFLAGS := -lm
 
 # Optimization modes
 DEBUG_FLAGS := -g -O0

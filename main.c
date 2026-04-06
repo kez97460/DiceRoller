@@ -17,7 +17,7 @@
         BOOLEAN_ARG(statistics, "-s", "Get statistics instead of throwing dice once") \
 
 #define OPTIONAL_ARGS \
-        OPTIONAL_UINT_ARG(samples, 100000, "--samples", "sample_count", "Amount of samples for statistics, if active") \
+        OPTIONAL_UINT_ARG(samples, 1000000, "--samples", "sample_count", "Amount of samples for statistics, if active") \
 
 #include "easyargs.h"
 #include <stdio.h>
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 {
     args_t args = make_default_args();
     // Parse arguments
-    if (!parse_args(argc, argv, &args) || args.help) {
+    if (!parse_args(argc, argv, &args) || args.help || !strcmp(args.dice_formula, "-h")) {
         print_help(argv[0]);
         return 1;
     }
@@ -53,10 +53,14 @@ int main(int argc, char *argv[])
     // Handle statistics here, then return
     if (args.statistics)
     {
-        if (args.result_only == false)
+        if (args.result_only)
         {
-            printf("Processing formula : %s \n", args.dice_formula);
+            printf("ERR: Incompatible arguments : -s -r\n");
+            return -1;
         }
+        
+
+        printf("Processing formula [%s] with %d samples.\n", args.dice_formula, args.samples);
 
         int32_t min_result = formulaParser_calculateMinResult(args.dice_formula, false);
         int32_t max_result = formulaParser_calculateMaxResult(args.dice_formula, false);
@@ -99,7 +103,10 @@ int main(int argc, char *argv[])
             printf("--- Raw results ---\n");
             for (uint32_t i = 0; i < result_array_size; i++)
             {
-                printf("[%d: %.0f%%] ", (i + min_result), (100 * percent_array[i]));
+                if (percent_array[i] > 0)
+                {
+                    printf("[%d: %.0f%%] ", (i + min_result), (100 * percent_array[i]));
+                }
             }
             printf("\n\n");
 

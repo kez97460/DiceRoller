@@ -21,7 +21,7 @@
  * 
  * @param str
  */
-uint32_t private_getFirstNumber(char *string)
+static uint32_t private_getFirstNumber(char *string)
 {
     uint32_t res = 0;
     uint32_t index = 0;
@@ -42,7 +42,7 @@ uint32_t private_getFirstNumber(char *string)
  * @param element_array_ptr 
  * @param buffer 
  */
-ParsedElementError_t private_parseElementInBuffer(ParsedElementArray_t *element_array_ptr, char *buffer)
+static ParsedElementError_t private_parseElementInBuffer(ParsedElementArray_t *element_array_ptr, char *buffer)
 {
     // This handles dice and numbers.
     //TODO: make this return an error if the string is invalid (contains something other than 0-9 and d)
@@ -97,7 +97,7 @@ ParsedElementError_t private_parseElementInBuffer(ParsedElementArray_t *element_
     return PELEM_OK;
 }
 
-uint32_t private_getOperatorPrecedence(Operator_t op)
+static uint32_t private_getOperatorPrecedence(Operator_t op)
 {
     switch (op)
     {
@@ -128,7 +128,7 @@ uint32_t private_getOperatorPrecedence(Operator_t op)
  * 
  * @param element_array 
  */
-int32_t private_calculateExpression(ParsedElementArray_t element_array)
+static int32_t private_calculateExpression(ParsedElementArray_t element_array)
 {
     int32_t retval = 0;
     
@@ -169,14 +169,14 @@ int32_t private_calculateExpression(ParsedElementArray_t element_array)
                     current_postfix_size++;
                     current_op_stack_size--;
                 }
-                // pop the '(' into nothing
+                // pop '('
                 current_op_stack_size--;
             }
             else 
             {
                 uint32_t precedence = private_getOperatorPrecedence(current_subtype);
             
-                while ((current_op_stack_size != 0) && (precedence <= private_getOperatorPrecedence(operator_stack[current_op_stack_size])))
+                while ((current_op_stack_size != 0) && (precedence <= private_getOperatorPrecedence(operator_stack[current_op_stack_size])) && (operator_stack[current_op_stack_size - 1] != OPERATOR_OPEN_P))
                 {
                     elements_postfix[current_postfix_size].type = TYPE_OPERATOR;
                     elements_postfix[current_postfix_size].subtype = operator_stack[current_op_stack_size - 1];
